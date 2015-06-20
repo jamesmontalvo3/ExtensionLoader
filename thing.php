@@ -14,6 +14,7 @@ class Extman {
 	}
 
 	public function loadExtensions () {
+		global $egExtmanConfig;
 
 		foreach( $egExtmanConfig as $extName => $conf ) {
 
@@ -42,58 +43,55 @@ class Extman {
  	// initiates or updates extensions
 	// does not delete extensions if they're disabled
 	public function updateExtensions () {
-				
-		foreach( $this->extensions as $ext_name => $ext_info ) {
+		global $egExtmanConfig;
 
-			if ( ! $this->isExtensionEnabled( $ext_name ) ) {
-				continue;
-			}
+		foreach( $egExtmanConfig as $extName => $conf ) {
 			
-			$ext_dir = "{$this->extensions_dir}/$ext_name";
+			$ext_dir = "{$this->extensions_dir}/$extName";
 			
 			// Check if extension directory exists, update extension accordingly
 			if ( is_dir($ext_dir) ) {
-				$this->checkExtensionForUpdates( $ext_name );
+				$this->checkExtensionForUpdates( $extName );
 			}
 			else {
-				$this->cloneGitRepo( $ext_name );
+				$this->cloneGitRepo( $extName );
 			}
 			
 		}
 		
 	}
 	
-	protected function cloneGitRepo ( $ext_name ) {
+	protected function cloneGitRepo ( $extName ) {
 
-		echo "\n    CLONING EXTENSION $ext_name\n";
+		echo "\n    CLONING EXTENSION $extName\n";
 	
-		$ext_info = $this->extensions[$ext_name];
+		$conf = $this->extensions[$extName];
 	
 		// change working directory to main extensions directory
 		chdir( $this->extensions_dir );
 		
 		// git clone into directory named the same as the extension
-		echo shell_exec( "git clone {$ext_info['origin']} $ext_name" );
+		echo shell_exec( "git clone {$conf['origin']} $extName" );
 		
-		if ( $ext_info['checkout'] !== 'master' ) {
+		if ( $conf['checkout'] !== 'master' ) {
 		
-			chdir( "{$this->extensions_dir}/$ext_name" );
+			chdir( "{$this->extensions_dir}/$extName" );
 		
-			echo shell_exec( "git checkout " . $ext_info['checkout'] ); 
+			echo shell_exec( "git checkout " . $conf['checkout'] ); 
 		
 		}
 				
 	}
 	
-	protected function checkExtensionForUpdates ( $ext_name ) {
+	protected function checkExtensionForUpdates ( $extName ) {
 	
-		echo "\n    Checking for updates in $ext_name\n";
+		echo "\n    Checking for updates in $extName\n";
 	
-		$ext_info = $this->extensions[$ext_name];
-		$ext_dir = "{$this->extensions_dir}/$ext_name";
+		$conf = $this->extensions[$extName];
+		$ext_dir = "{$this->extensions_dir}/$extName";
 		
 		if ( ! is_dir("$ext_dir/.git") ) {
-			echo "\nNot a git repository! ($ext_name)";
+			echo "\nNot a git repository! ($extName)";
 			return false;	
 		}
 		
@@ -104,12 +102,12 @@ class Extman {
 		echo shell_exec( "git fetch origin" );
 
 		$current_sha1 = shell_exec( "git rev-parse --verify HEAD" );
-		$fetched_sha1 = shell_exec( "git rev-parse --verify {$ext_info['checkout']}" );
+		$fetched_sha1 = shell_exec( "git rev-parse --verify {$conf['checkout']}" );
 		
 		if ($current_sha1 !== $fetched_sha1) {
 			echo "\nCurrent commit: $current_sha1";
 			echo "\nChecking out new commit: $fetched_sha1\n";
-			echo shell_exec( "git checkout {$ext_info['checkout']}" );
+			echo shell_exec( "git checkout {$conf['checkout']}" );
 		}
 		else {
 			echo "\nsha1 unchanged, no update required ($current_sha1)";
@@ -119,12 +117,12 @@ class Extman {
 	
 	}
 	
-	protected function isExtensionEnabled ( $ext_name ) {
-		$ext_info = $this->extensions[$ext_name];
+	protected function isExtensionEnabled ( $extName ) {
+		$conf = $this->extensions[$extName];
 		
-		if ( ! isset($ext_info["enable"]) || $ext_info["enable"] === true )
+		if ( ! isset($conf["enable"]) || $conf["enable"] === true )
 			return true; // enabled if no mention, or if explicitly set to true
-		else if ( $this->is_dev_environment && $ext_info["enable"] == "dev"  )
+		else if ( $this->is_dev_environment && $conf["enable"] == "dev"  )
 			return true;
 		else
 			return false;
@@ -132,16 +130,16 @@ class Extman {
 
 	public function loadExtensions () {
 		global $wgVersion;
-		foreach( $this->extensions as $ext_name => $ext_info ) {
+		foreach( $this->extensions as $extName => $conf ) {
 
-			if ( ! $this->isExtensionEnabled( $ext_name ) ) {
+			if ( ! $this->isExtensionEnabled( $extName ) ) {
 				continue;
 			}
 
-			require_once "{$this->extensions_dir}/$ext_name/$ext_name.php";
+			require_once "{$this->extensions_dir}/$extName/$extName.php";
 			
-			if ( isset($ext_info['callback']) )
-				call_user_function( $ext_info['callback'] );
+			if ( isset($conf['callback']) )
+				call_user_function( $conf['callback'] );
 		}
 			
 	}
