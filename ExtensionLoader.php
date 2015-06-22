@@ -45,40 +45,69 @@ $GLOBALS['wgExtensionCredits']['other'][] = array(
 $GLOBALS['wgMessagesDirs']['ExtensionLoader'] = __DIR__ . '/i18n';
 
 
-
 class ExtensionLoader {
 
-	public function loadSettings ( $extensionSettings, $extDir=false ) {
-		global $egExtensionLoaderConfig;
+	public $extDir;
+	public $extensionSettings;
+	public $oldExtensions = array();
+
+	public function __construct ( $extensionSettings=false, $extDir=false ) {
+		
+		if ( ! is_array( $extensionSettings ) ) {
+			$this->extensionSettings = array( $extensionSettings );
+		}
 
 		if ( ! $extDir ) {
 			global $IP;
-			$extDir = "$IP/extensions";
+			$this->extDir = "$IP/extensions";
 		}
 
-		if ( ! is_array( $extensionSettings ) ) {
-			$extensionSettings = array( $extensionSettings );
-		}
-
+		// initial value for $egExtensionLoaderConfig is empty array
+		global $egExtensionLoaderConfig;
 		$egExtensionLoaderConfig = array();
 
-		foreach( $extensionSettings as $file ) {
+		// add to $egExtensionLoaderConfig in settings files
+		foreach( $this->extensionSettings as $file ) {
 			require_once $file;
 		}
-		print_r( $egExtensionLoaderConfig );
-		// self::loadExtensions();
+
+		$this->extensions = $egExtensionLoaderConfig;
+		// @debug
+		// print_r( $egExtensionLoaderConfig );
+
 	}
 
-	public function loadExtensions () {
-		global $egExtensionLoaderConfig;
+	// public function loadExtensions () {
+	// 	// not sure if this function is needed at this point
+	// }
 
-		foreach( $egExtensionLoaderConfig as $extName => $conf ) {
+	public function startExtensionLoading () {
+		// this function will load any extensions using the MW 1.25+ extension
+		// loading method. For now it is just skipped.
+		// @todo: implement prior release
+
+		foreach( $this->extensions as $extName => $conf ) {
 
 			// load extension
-			if ( ! $conf['composer'] ) {
-				$entry = isset( $conf['entry'] ) ? $conf['entry'] : $extName . '.php';
-				require_once "$IP/extensions/$extName/$entry";
-			}
+			// if ( isset( $conf['composer'] ) && $conf['composer'] === true ) {
+			// 	continue;
+			// }
+
+			$entry = isset( $conf['entry'] ) ? $conf['entry'] : $extName . '.php';
+			
+			$extFile = $this->extDir . "/$extName/$entry";
+			// echo $this->extDir . "/$extName/$entry<br />";
+			$this->oldExtensions[] = $extFile;
+
+		}
+
+	}
+
+	public function completeExtensionLoading () {
+
+		foreach( $this->oldExtensions as $extName ) {
+
+			$conf = $this->extensions[ $extName ];
 
 			// apply global variables
 			if ( isset( $conf['globals'] ) && is_array( $conf['globals'] ) ) {
@@ -96,6 +125,7 @@ class ExtensionLoader {
 
 	}
 
+
  	// initiates or updates extensions
 	// does not delete extensions if they're disabled
 	public function updateExtensions () {
@@ -103,10 +133,10 @@ class ExtensionLoader {
 
 		foreach( $egExtensionLoaderConfig as $extName => $conf ) {
 			
-			$ext_dir = "{$this->extensions_dir}/$extName";
+			$extensionDir = $this->extDir . "/$extName";
 			
 			// Check if extension directory exists, update extension accordingly
-			if ( is_dir($ext_dir) ) {
+			if ( is_dir( $extensionDir ) ) {
 				$this->checkExtensionForUpdates( $extName );
 			}
 			else {
@@ -184,7 +214,7 @@ class ExtensionLoader {
 			return false;
 	}
 
-	public function loadExtensions () {
+	public function loadExtensionsOLD () {
 		global $wgVersion;
 		foreach( $this->extensions as $extName => $conf ) {
 
