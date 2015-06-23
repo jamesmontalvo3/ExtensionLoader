@@ -135,89 +135,89 @@ class ExtensionLoader {
 	}
 
 
- 	// initiates or updates extensions
-	// does not delete extensions if they're disabled
-	public function updateExtensions ( $maintScript ) {
-		global $egExtensionLoaderConfig;
+ // 	// initiates or updates extensions
+	// // does not delete extensions if they're disabled
+	// public function updateExtensions ( $maintScript ) {
+	// 	global $egExtensionLoaderConfig;
 
-		$this->maintScript = $maintScript;
+	// 	$this->maintScript = $maintScript;
 
-		foreach( $egExtensionLoaderConfig as $extName => $conf ) {
+	// 	foreach( $egExtensionLoaderConfig as $extName => $conf ) {
 			
-			$extensionDir = $this->extDir . "/$extName";
+	// 		$extensionDir = $this->extDir . "/$extName";
 			
-			// Check if extension directory exists, update extension accordingly
-			if ( is_dir( $extensionDir ) ) {
-				$this->checkExtensionForUpdates( $extName );
-			}
-			else {
-				$this->cloneGitRepo( $extName );
-			}
+	// 		// Check if extension directory exists, update extension accordingly
+	// 		if ( is_dir( $extensionDir ) ) {
+	// 			$this->checkExtensionForUpdates( $extName );
+	// 		}
+	// 		else {
+	// 			$this->cloneGitRepo( $extName );
+	// 		}
 			
-		}
+	// 	}
 		
-	}
+	// }
 	
 
-	/**
-	 *  'git' => 'https://git.wikimedia.org/...',
-	 *  'checkout' => 'master|tags/1.24.1|REL1_25|2b449A',
-	 *
-	 **/
-	protected function cloneGitRepo ( $extName ) {
+	// /**
+	//  *  'git' => 'https://git.wikimedia.org/...',
+	//  *  'checkout' => 'master|tags/1.24.1|REL1_25|2b449A',
+	//  *
+	//  **/
+	// protected function cloneGitRepo ( $extName ) {
 
-		$this->maintScript->output( "\n    CLONING EXTENSION $extName\n" );
+	// 	$this->maintScript->output( "\n    CLONING EXTENSION $extName\n" );
 	
-		$conf = $this->extensions[$extName];
+	// 	$conf = $this->extensions[$extName];
 	
-		// change working directory to main extensions directory
-		chdir( $this->extDir );
+	// 	// change working directory to main extensions directory
+	// 	chdir( $this->extDir );
 		
-		// git clone into directory named the same as the extension
-		$this->maintScript->output( shell_exec( "git clone {$conf['git']} $extName" ) );
+	// 	// git clone into directory named the same as the extension
+	// 	$this->maintScript->output( shell_exec( "git clone {$conf['git']} $extName" ) );
 		
-		if ( $conf['checkout'] !== 'master' ) {
+	// 	if ( $conf['checkout'] !== 'master' ) {
 		
-			chdir( "{$this->extDir}/$extName" );
+	// 		chdir( "{$this->extDir}/$extName" );
 		
-			$this->maintScript->output( shell_exec( "git checkout " . $conf['checkout'] ) ); 
+	// 		$this->maintScript->output( shell_exec( "git checkout " . $conf['checkout'] ) ); 
 		
-		}
+	// 	}
 				
-	}
+	// }
 	
-	protected function checkExtensionForUpdates ( $extName ) {
+	// protected function checkExtensionForUpdates ( $extName ) {
 	
-		$this->maintScript->output( "\n    Checking for updates in $extName\n" );
+	// 	$this->maintScript->output( "\n    Checking for updates in $extName\n" );
 	
-		$conf = $this->extensions[$extName];
-		$extensionDirectory = "{$this->extDir}/$extName";
+	// 	$conf = $this->extensions[$extName];
+	// 	$extensionDirectory = "{$this->extDir}/$extName";
 		
-		if ( ! is_dir("$extensionDirectory/.git") ) {
-			$this->maintScript->output( "\nNot a git repository! ($extName)" );
-			return false;	
-		}
+	// 	if ( ! is_dir("$extensionDirectory/.git") ) {
+	// 		$this->maintScript->output( "\nNot a git repository! ($extName)" );
+	// 		return false;	
+	// 	}
 		
-		// change working directory to main extensions directory
-		chdir( $extensionDirectory );
+	// 	// change working directory to main extensions directory
+	// 	chdir( $extensionDirectory );
 		
-		// git clone into directory named the same as the extension
-		$this->maintScript->output( shell_exec( "git fetch origin" ) );
+	// 	// git clone into directory named the same as the extension
+	// 	$this->maintScript->output( shell_exec( "git fetch origin" ) );
 
-		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
-		$fetchedSha1 = shell_exec( "git rev-parse --verify {$conf['checkout']}" );
+	// 	$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
+	// 	$fetchedSha1 = shell_exec( "git rev-parse --verify {$conf['checkout']}" );
 		
-		if ($currentSha1 !== $fetchedSha1) {
-			$this->maintScript->output( "\nCurrent commit: $currentSha1" );
-			$this->maintScript->output( "\nChecking out new commit: $fetchedSha1\n" );
-			$this->maintScript->output( shell_exec( "git checkout {$conf['checkout']}" ) );
-		}
-		else {
-			$this->maintScript->output( "\nsha1 unchanged, no update required ($currentSha1)" );
-		}
+	// 	if ($currentSha1 !== $fetchedSha1) {
+	// 		$this->maintScript->output( "\nCurrent commit: $currentSha1" );
+	// 		$this->maintScript->output( "\nChecking out new commit: $fetchedSha1\n" );
+	// 		$this->maintScript->output( shell_exec( "git checkout {$conf['checkout']}" ) );
+	// 	}
+	// 	else {
+	// 		$this->maintScript->output( "\nsha1 unchanged, no update required ($currentSha1)" );
+	// 	}
 		
-		return true;
+	// 	return true;
 	
-	}
+	// }
 
 }
