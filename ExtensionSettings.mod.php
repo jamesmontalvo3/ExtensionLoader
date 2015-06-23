@@ -43,7 +43,7 @@ $egExtensionLoaderConfig += array(
 
 	'ParserFunctions' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ParserFunctions.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'globals' => array(
 			'wgPFEnableStringFunctions' => true,
 		),
@@ -51,17 +51,17 @@ $egExtensionLoaderConfig += array(
 
 	'StringFunctionsEscaped' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/StringFunctionsEscaped.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'ExternalData' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ExternalData.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'Cite' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Cite.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'globals' => array(
 			'wgCiteEnablePopups' => true,
 		),
@@ -74,7 +74,7 @@ $egExtensionLoaderConfig += array(
 
 	'WhoIsWatching' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/WhoIsWatching.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'globals' => array(
 			'wgPageShowWatchingUsers' => true,
 		),
@@ -82,32 +82,32 @@ $egExtensionLoaderConfig += array(
 
 	'CharInsert' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/CharInsert.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	// 'SemanticForms' => array(
 	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticForms.git',
-	// 	'branch' => 'master',
+	// 	'branch' => 'REL1_25',
 	// ),
 
 	// 'SemanticInternalObjects' => array(
 	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticInternalObjects.git',
-	// 	'branch' => 'master',
+	// 	'branch' => 'REL1_25',
 	// ),
 
 	// 'SemanticCompoundQueries' => array(
 	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticCompoundQueries.git',
-	// 	'branch' => 'master',
+	// 	'branch' => 'REL1_25',
 	// ),
 
 	'Arrays' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Arrays.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'TitleKey' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/TitleKey.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'TalkRight' => array(
@@ -117,7 +117,7 @@ $egExtensionLoaderConfig += array(
 
 	'AdminLinks' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'afterFn' => function() {
 			$wgGroupPermissions['sysop']['adminlinks'] = true;
 		}
@@ -125,18 +125,18 @@ $egExtensionLoaderConfig += array(
 
 	'DismissableSiteNotice' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/DismissableSiteNotice.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'BatchUserRights' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/BatchUserRights.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 
 	'HeaderTabs' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/HeaderTabs.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'globals' => array(
 			'htEditTabLink' => false,
 			'htRenderSingleTab' => true,
@@ -145,7 +145,7 @@ $egExtensionLoaderConfig += array(
 
 	'WikiEditor' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/WikiEditor.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'afterFn' => function() {
 			$wgDefaultUserOptions['usebetatoolbar'] = 1;
 			$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
@@ -165,7 +165,7 @@ $egExtensionLoaderConfig += array(
 	// https://git.wikimedia.org/git/mediawiki/extensions/SyntaxHighlight_Pygments.git
 	'SyntaxHighlight_GeSHi' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SyntaxHighlight_GeSHi.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'Wiretap' => array(
@@ -183,17 +183,17 @@ $egExtensionLoaderConfig += array(
 
 	'InputBox' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/InputBox.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'ReplaceText' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ReplaceText.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'Interwiki' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Interwiki.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'afterFn' => function() {
 			$wgGroupPermissions['sysop']['interwiki'] = true;
 		}
@@ -224,7 +224,7 @@ $egExtensionLoaderConfig += array(
 
 	'Variables' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Variables.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'SummaryTimeline' => array(
@@ -234,12 +234,12 @@ $egExtensionLoaderConfig += array(
 
 	'YouTube' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/YouTube.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 	),
 
 	'ContributionScores' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ContributionScores.git',
-		'branch' => 'master',
+		'branch' => 'REL1_25',
 		'afterFn' => function() {
 			$wgContribScoreIgnoreBots = true;          // Exclude Bots from the reporting - Can be omitted.
 			$wgContribScoreIgnoreBlockedUsers = true;  // Exclude Blocked Users from the reporting - Can be omitted.
