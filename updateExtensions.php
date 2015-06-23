@@ -59,14 +59,16 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		}
 
 
-		$this->output( "\n Finished recording the state of wiki watching. \n" );
+		$this->output( "\n Finished updating wiki extensions. \n" );
 	}
 
 
 	/**
 	 *  'git' => 'https://git.wikimedia.org/...',
-	 *  'checkout' => 'master|tags/1.24.1|REL1_25|2b449A',
-	 *
+	 *  AND EITHER
+	 *  'branch' => 'master|REL1_25|2b449A',
+	 *  OR
+	 *  'tag' => '1.24.1'
 	 **/
 	protected function cloneGitRepo ( $extName ) {
 
@@ -80,7 +82,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		// git clone into directory named the same as the extension
 		$this->output( shell_exec( "git clone {$conf['git']} $extName" ) );
 		
-		if ( $conf['checkout'] !== 'master' ) {
+		if ( isset( $conf['branch'] ) && $conf['branch'] !== 'master' ) {
 		
 			chdir( "{$this->extensionLoader->extDir}/$extName" );
 		
