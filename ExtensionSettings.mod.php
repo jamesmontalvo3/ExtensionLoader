@@ -10,11 +10,34 @@
 // move to composer?: SemanticMeetingMinutes
 // pretty sure this isn't needed with SMM: "$IP/extensions/Synopsize/Synopsize.php";
 
-// consider this:
+
+/**
+ * Extensions being considered
+ */
 // 'ParserFunctionHelper' => array(
 // 	'git' => 'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
 // 	'branch' => 'master',
 // ),
+
+// not in wikimedia git, now in github/kghbln:
+// https://github.com/kghbln/ImportUsers  -- may not work well with newer versions of MW
+// consider taking into EMW
+// 'ImportUsers' => array(
+// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ImportUsers.git',
+// 	'branch' => 'master',
+// 	'globals' => array(
+// 		'wgShowExceptionDetails' => true,
+// 	)
+// ),
+
+// In SVN, see https://www.mediawiki.org/wiki/Extension:Pipe_Escape
+// Do we use this?
+// 'PipeEscape' => array(
+// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/PipeEscape.git',
+// 	'branch' => 'master',
+// ),
+
+
 
 $egExtensionLoaderConfig += array(
 
@@ -44,13 +67,8 @@ $egExtensionLoaderConfig += array(
 		),
 	),
 
-	'PipeEscape' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/PipeEscape.git',
-		'branch' => 'master',
-	),
-
 	'HeaderFooter' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/HeaderFooter.git',
+		'git' => 'https://github.com/enterprisemediawiki/HeaderFooter.git',
 		'branch' => 'master',
 	),
 
@@ -93,7 +111,7 @@ $egExtensionLoaderConfig += array(
 	),
 
 	'TalkRight' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/TalkRight.git',
+		'git' => 'https://github.com/enterprisemediawiki/TalkRight.git',
 		'branch' => 'master',
 	),
 
@@ -115,13 +133,6 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'master',
 	),
 
-	'ImportUsers' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ImportUsers.git',
-		'branch' => 'master',
-		'globals' => array(
-			'wgShowExceptionDetails' => true,
-		)
-	),
 
 	'HeaderTabs' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/HeaderTabs.git',
@@ -150,6 +161,8 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'master',
 	),
 
+	// consider replacing with SyntaxHighlight_Pygments
+	// https://git.wikimedia.org/git/mediawiki/extensions/SyntaxHighlight_Pygments.git
 	'SyntaxHighlight_GeSHi' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SyntaxHighlight_GeSHi.git',
 		'branch' => 'master',
