@@ -25,8 +25,11 @@
  */
 
 
-// @todo: FIXME this needs to work if the extensions directory is not $IP/extensions
-require_once( __DIR__ . '/../../maintenance/Maintenance.php' );
+// @todo: does this always work if extensions are not in $IP/extensions ??
+// this was what was done by SMW
+$basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
+require_once $basePath . '/maintenance/Maintenance.php';
+
 
 class ExtensionLoaderUpdateExtensions extends Maintenance {
 	

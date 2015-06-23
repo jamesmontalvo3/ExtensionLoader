@@ -106,8 +106,9 @@ class ExtensionLoader {
 			
 			$extFile = $this->extDir . "/$extName/$entry";
 			// echo $this->extDir . "/$extName/$entry<br />";
-			$this->oldExtensions[ $extName ] = $extFile;
-
+			if ( file_exists( $extFile ) ) {
+				$this->oldExtensions[ $extName ] = $extFile;
+			}
 		}
 
 	}
