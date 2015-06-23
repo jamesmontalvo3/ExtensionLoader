@@ -50,8 +50,9 @@ class ExtensionLoader {
 	public $extDir;
 	public $extensionSettings;
 	public $oldExtensions = array();
+	static $loader;
 
-	public function __construct ( $extensionSettings=false, $extDir=false ) {
+	public function __construct ( $extensionSettings, $extDir=false ) {
 		
 		if ( ! is_array( $extensionSettings ) ) {
 			$this->extensionSettings = array( $extensionSettings );
@@ -60,6 +61,9 @@ class ExtensionLoader {
 		if ( ! $extDir ) {
 			global $IP;
 			$this->extDir = "$IP/extensions";
+		}
+		else {
+			$this->extDir = $extDir;
 		}
 
 		// initial value for $egExtensionLoaderConfig is empty array
@@ -81,6 +85,11 @@ class ExtensionLoader {
 	// 	// not sure if this function is needed at this point
 	// }
 
+	static public function init ( $extensionSettings, $extDir=false ) {
+		self::$loader = new self( $extensionSettings, $extDir );
+		return self::$loader;
+	}
+
 	public function startExtensionLoading () {
 		// this function will load any extensions using the MW 1.25+ extension
 		// loading method. For now it is just skipped.
@@ -97,7 +106,7 @@ class ExtensionLoader {
 			
 			$extFile = $this->extDir . "/$extName/$entry";
 			// echo $this->extDir . "/$extName/$entry<br />";
-			$this->oldExtensions[] = $extFile;
+			$this->oldExtensions[ $extName ] = $extFile;
 
 		}
 
@@ -105,7 +114,7 @@ class ExtensionLoader {
 
 	public function completeExtensionLoading () {
 
-		foreach( $this->oldExtensions as $extName ) {
+		foreach( $this->oldExtensions as $extName => $extFile ) {
 
 			$conf = $this->extensions[ $extName ];
 
@@ -128,8 +137,10 @@ class ExtensionLoader {
 
  	// initiates or updates extensions
 	// does not delete extensions if they're disabled
-	public function updateExtensions () {
+	public function updateExtensions ( $maintScript ) {
 		global $egExtensionLoaderConfig;
+
+		$this->maintScript = $maintScript;
 
 		foreach( $egExtensionLoaderConfig as $extName => $conf ) {
 			
@@ -147,23 +158,29 @@ class ExtensionLoader {
 		
 	}
 	
+
+	/**
+	 *  'git' => 'https://git.wikimedia.org/...',
+	 *  'checkout' => 'master|tags/1.24.1|REL1_25|2b449A',
+	 *
+	 **/
 	protected function cloneGitRepo ( $extName ) {
 
-		echo "\n    CLONING EXTENSION $extName\n";
+		$this->maintScript->output( "\n    CLONING EXTENSION $extName\n" );
 	
 		$conf = $this->extensions[$extName];
 	
 		// change working directory to main extensions directory
-		chdir( $this->extensions_dir );
+		chdir( $this->extDir );
 		
 		// git clone into directory named the same as the extension
-		echo shell_exec( "git clone {$conf['origin']} $extName" );
+		$this->maintScript->output( shell_exec( "git clone {$conf['git']} $extName" ) );
 		
 		if ( $conf['checkout'] !== 'master' ) {
 		
-			chdir( "{$this->extensions_dir}/$extName" );
+			chdir( "{$this->extDir}/$extName" );
 		
-			echo shell_exec( "git checkout " . $conf['checkout'] ); 
+			$this->maintScript->output( shell_exec( "git checkout " . $conf['checkout'] ) ); 
 		
 		}
 				
@@ -171,63 +188,36 @@ class ExtensionLoader {
 	
 	protected function checkExtensionForUpdates ( $extName ) {
 	
-		echo "\n    Checking for updates in $extName\n";
+		$this->maintScript->output( "\n    Checking for updates in $extName\n" );
 	
 		$conf = $this->extensions[$extName];
-		$ext_dir = "{$this->extensions_dir}/$extName";
+		$extensionDirectory = "{$this->extDir}/$extName";
 		
-		if ( ! is_dir("$ext_dir/.git") ) {
-			echo "\nNot a git repository! ($extName)";
+		if ( ! is_dir("$extensionDirectory/.git") ) {
+			$this->maintScript->output( "\nNot a git repository! ($extName)" );
 			return false;	
 		}
 		
 		// change working directory to main extensions directory
-		chdir( $ext_dir );
+		chdir( $extensionDirectory );
 		
 		// git clone into directory named the same as the extension
-		echo shell_exec( "git fetch origin" );
+		$this->maintScript->output( shell_exec( "git fetch origin" ) );
 
-		$current_sha1 = shell_exec( "git rev-parse --verify HEAD" );
-		$fetched_sha1 = shell_exec( "git rev-parse --verify {$conf['checkout']}" );
+		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
+		$fetchedSha1 = shell_exec( "git rev-parse --verify {$conf['checkout']}" );
 		
-		if ($current_sha1 !== $fetched_sha1) {
-			echo "\nCurrent commit: $current_sha1";
-			echo "\nChecking out new commit: $fetched_sha1\n";
-			echo shell_exec( "git checkout {$conf['checkout']}" );
+		if ($currentSha1 !== $fetchedSha1) {
+			$this->maintScript->output( "\nCurrent commit: $currentSha1" );
+			$this->maintScript->output( "\nChecking out new commit: $fetchedSha1\n" );
+			$this->maintScript->output( shell_exec( "git checkout {$conf['checkout']}" ) );
 		}
 		else {
-			echo "\nsha1 unchanged, no update required ($current_sha1)";
+			$this->maintScript->output( "\nsha1 unchanged, no update required ($currentSha1)" );
 		}
 		
 		return true;
 	
-	}
-	
-	protected function isExtensionEnabled ( $extName ) {
-		$conf = $this->extensions[$extName];
-		
-		if ( ! isset($conf["enable"]) || $conf["enable"] === true )
-			return true; // enabled if no mention, or if explicitly set to true
-		else if ( $this->is_dev_environment && $conf["enable"] == "dev"  )
-			return true;
-		else
-			return false;
-	}
-
-	public function loadExtensionsOLD () {
-		global $wgVersion;
-		foreach( $this->extensions as $extName => $conf ) {
-
-			if ( ! $this->isExtensionEnabled( $extName ) ) {
-				continue;
-			}
-
-			require_once "{$this->extensions_dir}/$extName/$extName.php";
-			
-			if ( isset($conf['callback']) )
-				call_user_function( $conf['callback'] );
-		}
-			
 	}
 
 }
