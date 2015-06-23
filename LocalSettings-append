@@ -7,7 +7,6 @@
  */
 require_once "$IP/extensions/ExtensionLoader/ExtensionLoader.php";
 ExtensionLoader::init( "$IP/ExtensionSettings.php" );
-ExtensionLoader::$loader->startExtensionLoading();
 foreach( ExtensionLoader::$loader->oldExtensions as $extensionPath ) {
 	require_once $extensionPath;
 }

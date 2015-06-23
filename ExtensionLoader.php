@@ -87,7 +87,10 @@ class ExtensionLoader {
 
 	static public function init ( $extensionSettings, $extDir=false ) {
 		self::$loader = new self( $extensionSettings, $extDir );
-		return self::$loader;
+		global $egExtensionLoaderUpdateScript;
+		if ( ! $egExtensionLoaderUpdateScript ) {
+			self::$loader->startExtensionLoading();
+		}
 	}
 
 	public function startExtensionLoading () {
@@ -106,9 +109,7 @@ class ExtensionLoader {
 			
 			$extFile = $this->extDir . "/$extName/$entry";
 			// echo $this->extDir . "/$extName/$entry<br />";
-			if ( file_exists( $extFile ) ) {
-				$this->oldExtensions[ $extName ] = $extFile;
-			}
+			$this->oldExtensions[ $extName ] = $extFile;
 		}
 
 	}

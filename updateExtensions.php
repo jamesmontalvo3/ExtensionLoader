@@ -24,10 +24,11 @@
  * @ingroup Maintenance
  */
 
+$egExtensionLoaderUpdateScript = true;
 
 // @todo: does this always work if extensions are not in $IP/extensions ??
 // this was what was done by SMW
-$basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
+$basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../..';
 require_once $basePath . '/maintenance/Maintenance.php';
 
 
@@ -117,7 +118,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		}
 		else {
 			$checkoutTest = 'origin/master';
-			$checkout = 'origin/master'
+			$checkout = 'origin/master';
 		}
 
 		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
