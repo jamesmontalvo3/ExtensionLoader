@@ -67,20 +67,20 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'master',
 	),
 
-	'SemanticForms' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticForms.git',
-		'branch' => 'master',
-	),
+	// 'SemanticForms' => array(
+	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticForms.git',
+	// 	'branch' => 'master',
+	// ),
 
-	'SemanticInternalObjects' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticInternalObjects.git',
-		'branch' => 'master',
-	),
+	// 'SemanticInternalObjects' => array(
+	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticInternalObjects.git',
+	// 	'branch' => 'master',
+	// ),
 
-	'SemanticCompoundQueries' => array(
-		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticCompoundQueries.git',
-		'branch' => 'master',
-	),
+	// 'SemanticCompoundQueries' => array(
+	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticCompoundQueries.git',
+	// 	'branch' => 'master',
+	// ),
 
 	'Arrays' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Arrays.git',
