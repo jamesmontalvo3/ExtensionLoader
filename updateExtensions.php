@@ -82,12 +82,13 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		// git clone into directory named the same as the extension
 		$this->output( shell_exec( "git clone {$conf['git']} $extName" ) );
 		
+		chdir( "{$this->extensionLoader->extDir}/$extName" );
+
 		if ( isset( $conf['branch'] ) && $conf['branch'] !== 'master' ) {
-		
-			chdir( "{$this->extensionLoader->extDir}/$extName" );
-		
-			$this->output( shell_exec( "git checkout " . $conf['checkout'] ) ); 
-		
+			$this->output( shell_exec( "git checkout " . $conf['branch'] ) );
+		}
+		else if ( isset( $conf['tag'] ) ) {
+			$this->output( shell_exec( "git checkout tags/" . $conf['tag'] ) );			
 		}
 				
 	}
