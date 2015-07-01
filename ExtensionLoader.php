@@ -37,6 +37,7 @@ EOT;
 $GLOBALS['wgExtensionCredits']['other'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'ExtensionLoader',
+	'version'        => '0.1',
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:ExtensionLoader',
 	'author'         => array( '[https://www.mediawiki.org/wiki/User:Jamesmontalvo3 James Montalvo]' ),
 	'descriptionmsg' => 'extensionloader-desc',
