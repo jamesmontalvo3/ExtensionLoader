@@ -34,6 +34,8 @@ require_once $basePath . '/maintenance/Maintenance.php';
 
 class ExtensionLoaderUpdateExtensions extends Maintenance {
 	
+	protected $extensionLoadingErrors = array();
+
 	public function __construct() {
 		parent::__construct();
 		
@@ -44,7 +46,34 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 	public function execute() {
 		$this->extensionLoader = ExtensionLoader::$loader;
 
-		foreach( $this->extensionLoader->extensions as $extName => $conf ) {
+		if ( $this->getArg(0) ) {
+			$i = 0;
+			$toLoad = array();
+			$didNotLoad = array();
+			while ( $this->getArg($i) ) {
+				$ext = $this->getArg($i);
+				if ( array_key_exists( $ext, $this->extensionLoader->extensions ) ) {
+					$toLoad[] = $ext;
+				}
+				else {
+					$didNotLoad[] = $ext;
+				}
+				$i++;
+			}
+			$this->output( "\nUpdating the following extensions:\n\t" . implode( "\n\t", $toLoad ) . "\n" );
+
+			if ( count( $didNotLoad ) > 0 ) {
+				foreach( $didNotLoad as $ext ) {
+					$this->extensionLoadingErrors[] = "\"$ext\" not loaded: not in extension settings file";
+				}
+			}
+		}
+		else {
+			$toLoad = array_keys( $this->extensionLoader->extensions );
+			$this->output( "Updating all extensions" );
+		}
+
+		foreach( $toLoad as $extName ) {
 			
 			$extensionDir = $this->extensionLoader->extDir . "/$extName";
 			
@@ -59,7 +88,9 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		}
 
 
-		$this->output( "\n Finished updating wiki extensions. \n" );
+		$this->output( "\n## Finished updating wiki extensions. \n" );
+		$this->showErrors();
+		$this->output( "\n" );
 	}
 
 
@@ -72,7 +103,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 	 **/
 	protected function cloneGitRepo ( $extName ) {
 
-		$this->output( "\n    CLONING EXTENSION $extName\n" );
+		$this->output( "\n## CLONING EXTENSION $extName\n" );
 	
 		$conf = $this->extensionLoader->extensions[$extName];
 	
@@ -95,7 +126,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 	
 	protected function checkExtensionForUpdates ( $extName ) {
 	
-		$this->output( "\n    Checking for updates in $extName\n" );
+		$this->output( "\n## Checking for updates in $extName" );
 	
 		$conf = $this->extensionLoader->extensions[$extName];
 		$extensionDirectory = "{$this->extensionLoader->extDir}/$extName";
@@ -143,6 +174,8 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		else {
 			$this->output( "\nsha1 unchanged, no update required ($currentSha1)" );
 		}
+
+		$this->output( "\n" );
 		
 		return true;
 	
@@ -150,7 +183,16 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 
 
+	protected function showErrors () {
 
+		if ( count( $this->extensionLoadingErrors ) > 0 ) {
+			$this->output( "\n## The following errors occurred:" );
+			foreach ( $this->extensionLoadingErrors as $i => $err ) {
+				$num = $i + 1;
+				$this->output( "\n\t($num) $err" );
+			}
+		}
+	}
 
 
 }
