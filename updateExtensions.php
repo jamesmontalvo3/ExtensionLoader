@@ -111,7 +111,15 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		chdir( $this->extensionLoader->extDir );
 		
 		// git clone into directory named the same as the extension
-		$this->output( shell_exec( "git clone {$conf['git']} $extName" ) );
+		$cloneAttempts = 0;
+		while ( ! is_dir( "{$this->extensionLoader->extDir}/$extName" ) ) {
+			if ( $cloneAttempts > 0 ) {
+				$this->output( "Clone $cloneAttempts failed. Reattempting...\n" );
+			}
+
+			$this->output( shell_exec( "git clone {$conf['git']} $extName" ) );
+			$cloneAttempts++;
+		}
 		
 		chdir( "{$this->extensionLoader->extDir}/$extName" );
 
