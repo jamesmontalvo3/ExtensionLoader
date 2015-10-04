@@ -112,13 +112,19 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		
 		// git clone into directory named the same as the extension
 		$cloneAttempts = 0;
+		$maxAttempts = 5;
 		while ( ! is_dir( "{$this->extensionLoader->extDir}/$extName" ) ) {
 			if ( $cloneAttempts > 0 ) {
-				$this->output( "Clone $cloneAttempts failed. Reattempting...\n" );
+				$wait = $cloneAttempts * 5;
+				$this->output( "Clone $cloneAttempts failed. Reattempting in $wait seconds...\n" );
+				sleep( $wait );
 			}
 
 			$this->output( shell_exec( "git clone {$conf['git']} $extName" ) );
 			$cloneAttempts++;
+			if ( $cloneAttempts > $maxAttempts ) {
+				continue; // this isn't ideal. Should error-handle better. @fixme
+			}
 		}
 		
 		chdir( "{$this->extensionLoader->extDir}/$extName" );
