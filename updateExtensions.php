@@ -33,15 +33,15 @@ require_once $basePath . '/maintenance/Maintenance.php';
 
 
 class ExtensionLoaderUpdateExtensions extends Maintenance {
-	
+
 	protected $extensionLoadingErrors = array();
 
 	public function __construct() {
 		parent::__construct();
-		
+
 		$this->mDescription = "Update or install extensions managed by ExtensionLoader.";
 	}
-	
+
  	// initiates or updates extensions
 	public function execute() {
 		$this->extensionLoader = ExtensionLoader::$loader;
@@ -74,9 +74,9 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		}
 
 		foreach( $toLoad as $extName ) {
-			
+
 			$extensionDir = $this->extensionLoader->extDir . "/$extName";
-			
+
 			// Check if extension directory exists, update extension accordingly
 			if ( is_dir( $extensionDir ) ) {
 				$this->checkExtensionForUpdates( $extName );
@@ -84,11 +84,11 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 			else {
 				$this->cloneGitRepo( $extName );
 			}
-			
+
 		}
 
 
-		$this->output( "\n## Finished updating wiki extensions. \n" );
+		$this->output( "\n## Finished updating wiki extensions. Remember to run update.php\n" );
 		$this->showErrors();
 		$this->output( "\n" );
 	}
@@ -104,12 +104,12 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 	protected function cloneGitRepo ( $extName ) {
 
 		$this->output( "\n## CLONING EXTENSION $extName\n" );
-	
+
 		$conf = $this->extensionLoader->extensions[$extName];
-	
+
 		// change working directory to main extensions directory
 		chdir( $this->extensionLoader->extDir );
-		
+
 		// git clone into directory named the same as the extension
 		$cloneAttempts = 0;
 		$maxAttempts = 5;
@@ -126,33 +126,33 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 				continue; // this isn't ideal. Should error-handle better. @fixme
 			}
 		}
-		
+
 		chdir( "{$this->extensionLoader->extDir}/$extName" );
 
 		if ( isset( $conf['branch'] ) && $conf['branch'] !== 'master' ) {
 			$this->output( shell_exec( "git checkout " . $conf['branch'] ) );
 		}
 		else if ( isset( $conf['tag'] ) ) {
-			$this->output( shell_exec( "git checkout tags/" . $conf['tag'] ) );			
+			$this->output( shell_exec( "git checkout tags/" . $conf['tag'] ) );
 		}
-				
+
 	}
-	
+
 	protected function checkExtensionForUpdates ( $extName ) {
-	
+
 		$this->output( "\n## Checking for updates in $extName" );
-	
+
 		$conf = $this->extensionLoader->extensions[$extName];
 		$extensionDirectory = "{$this->extensionLoader->extDir}/$extName";
-		
+
 		if ( ! is_dir("$extensionDirectory/.git") ) {
 			$this->output( "\nNot a git repository! ($extName)" );
-			return false;	
+			return false;
 		}
-		
+
 		// change working directory to main extensions directory
 		chdir( $extensionDirectory );
-		
+
 		// git clone into directory named the same as the extension
 		$this->output( shell_exec( "git fetch origin" ) );
 
@@ -171,11 +171,11 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
 		$fetchedSha1 = shell_exec( "git rev-parse --verify $checkout" );
-		
+
 		if ($currentSha1 !== $fetchedSha1) {
 			$this->output( "\nCurrent commit: $currentSha1" );
 			$this->output( "\nChecking out new commit for $checkout: $fetchedSha1\n" );
-			
+
 			if ( $checkoutType === 'tag' ) {
 				// checkout the tagged commit
 				$this->output( shell_exec( "git checkout $checkout" ) );
@@ -190,9 +190,9 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		}
 
 		$this->output( "\n" );
-		
+
 		return true;
-	
+
 	}
 
 

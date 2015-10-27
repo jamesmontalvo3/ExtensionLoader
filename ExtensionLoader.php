@@ -53,174 +53,95 @@ class ExtensionLoader {
 	public $oldExtensions = array();
 	static $loader;
 
-	public function __construct ( $extensionSettings, $extDir=false ) {
-		
-		if ( ! is_array( $extensionSettings ) ) {
-			$this->extensionSettings = array( $extensionSettings );
-		}
+	public function __construct ( $extDir=false, $styleDir=false ) {
 
 		if ( ! $extDir ) {
 			global $IP;
 			$this->extDir = "$IP/extensions";
 		}
 		else {
+			global $wgExtensionDirectory;
+			$wgExtensionDirectory = $extDir;
 			$this->extDir = $extDir;
 		}
 
-		// initial value for $egExtensionLoaderConfig is empty array
-		global $egExtensionLoaderConfig;
-		$egExtensionLoaderConfig = array();
-
-		// add to $egExtensionLoaderConfig in settings files
-		foreach( $this->extensionSettings as $file ) {
-			require_once $file;
-		}
-
-		$this->extensions = $egExtensionLoaderConfig;
-		// @debug
-		// print_r( $egExtensionLoaderConfig );
-
-	}
-
-	// public function loadExtensions () {
-	// 	// not sure if this function is needed at this point
-	// }
-
-	static public function init ( $extensionSettings, $extDir=false ) {
-		self::$loader = new self( $extensionSettings, $extDir );
-		global $egExtensionLoaderUpdateScript;
-		if ( ! $egExtensionLoaderUpdateScript ) {
-			self::$loader->startExtensionLoading();
-		}
-	}
-
-	public function startExtensionLoading () {
-		// this function will load any extensions using the MW 1.25+ extension
-		// loading method. For now it is just skipped.
-		// @todo: implement prior release
-
-		foreach( $this->extensions as $extName => $conf ) {
-
-			// load extension
-			// if ( isset( $conf['composer'] ) && $conf['composer'] === true ) {
-			// 	continue;
-			// }
-
-			$entry = isset( $conf['entry'] ) ? $conf['entry'] : $extName . '.php';
-			
-			$extFile = $this->extDir . "/$extName/$entry";
-			// echo $this->extDir . "/$extName/$entry<br />";
-			$this->oldExtensions[ $extName ] = $extFile;
-		}
-
-	}
-
-	public function completeExtensionLoading () {
-
-		foreach( $this->oldExtensions as $extName => $extFile ) {
-
-			$conf = $this->extensions[ $extName ];
-
-			// apply global variables
-			if ( isset( $conf['globals'] ) && is_array( $conf['globals'] ) ) {
-				foreach( $conf['globals'] as $var => $value ) {
-					$GLOBALS[$var] = $value;
-				}
-			}
-
-			// run extenion setup function
-			if ( isset( $conf['afterFn'] ) ) {
-				$conf['afterFn'](); // @todo: what should be the inputs to this function? any?
-			}
-
+		if ( $styleDir ) {
+			global $wgStyleDirectory;
+			$wgStyleDirectory = $styleDir;
 		}
 
 	}
 
 
- // 	// initiates or updates extensions
-	// // does not delete extensions if they're disabled
-	// public function updateExtensions ( $maintScript ) {
-	// 	global $egExtensionLoaderConfig;
+	/**
+	 *  For legacy extensions (extensions which have not been upgraded to the new method of
+	 *  loading) it is not possible to actually load them from within this function. Limitations
+	 *  of PHP and MediaWiki won't allow it. This functions registers the extension so it can
+	 *  be included in calls to `updateExtensions.php`, and then returns the proper file path
+	 *  to be used in `require_once` calls in `LocalSettings.php` like:
+	 *
+	 *  require_once $extensionLoader->registerLegacyExtension(
+	 *      "ParserFunctions",
+	 *      "https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git",
+	 *      "REL1_25"
+	 *  );
+	 *
+	 **/
+	public function registerLegacyExtension ( $name, $git, $branch, $specialEntryPointFileName=false ) {
+		$this->extensions[$name] = array(
+			'git' => $git,
+			'branch' => $branch,
+			'specialEntryPointFileName' => $specialEntryPointFileName,
+		);
+		$entryFile = $specialEntryPointFileName ? $specialEntryPointFileName : $name . '.php';
+		return $this->extDir . "/$name/$entryFile";
+	}
 
-	// 	$this->maintScript = $maintScript;
+	/**
+	 *
+	 *
+	 **/
+	public function load ( $name, $git, $branch ) {
+		$this->extensions[$name] = array(
+			'git' => $git,
+			'branch' => $branch
+		);
+		wfLoadExtension( $name );
+	}
 
-	// 	foreach( $egExtensionLoaderConfig as $extName => $conf ) {
-			
-	// 		$extensionDir = $this->extDir . "/$extName";
-			
-	// 		// Check if extension directory exists, update extension accordingly
-	// 		if ( is_dir( $extensionDir ) ) {
-	// 			$this->checkExtensionForUpdates( $extName );
-	// 		}
-	// 		else {
-	// 			$this->cloneGitRepo( $extName );
-	// 		}
-			
-	// 	}
-		
-	// }
-	
+	/**
+	 *
+	 *
+	 **/
+	public function multiLoad ( $extensions ) {
+		foreach ( $extensions as $ext => $info ) {
+			$this->extensions[$ext] = $info;
+		}
+		wfLoadExtensions( array_keys( $extensions ) );
+	}
 
-	// /**
-	//  *  'git' => 'https://git.wikimedia.org/...',
-	//  *  'checkout' => 'master|tags/1.24.1|REL1_25|2b449A',
-	//  *
-	//  **/
-	// protected function cloneGitRepo ( $extName ) {
 
-	// 	$this->maintScript->output( "\n    CLONING EXTENSION $extName\n" );
-	
-	// 	$conf = $this->extensions[$extName];
-	
-	// 	// change working directory to main extensions directory
-	// 	chdir( $this->extDir );
-		
-	// 	// git clone into directory named the same as the extension
-	// 	$this->maintScript->output( shell_exec( "git clone {$conf['git']} $extName" ) );
-		
-	// 	if ( $conf['checkout'] !== 'master' ) {
-		
-	// 		chdir( "{$this->extDir}/$extName" );
-		
-	// 		$this->maintScript->output( shell_exec( "git checkout " . $conf['checkout'] ) ); 
-		
-	// 	}
-				
-	// }
-	
-	// protected function checkExtensionForUpdates ( $extName ) {
-	
-	// 	$this->maintScript->output( "\n    Checking for updates in $extName\n" );
-	
-	// 	$conf = $this->extensions[$extName];
-	// 	$extensionDirectory = "{$this->extDir}/$extName";
-		
-	// 	if ( ! is_dir("$extensionDirectory/.git") ) {
-	// 		$this->maintScript->output( "\nNot a git repository! ($extName)" );
-	// 		return false;	
-	// 	}
-		
-	// 	// change working directory to main extensions directory
-	// 	chdir( $extensionDirectory );
-		
-	// 	// git clone into directory named the same as the extension
-	// 	$this->maintScript->output( shell_exec( "git fetch origin" ) );
+	/**
+	 *
+	 *
+	 **/
+	public function loadSkin ( $name, $git, $branch ) {
+		$this->skins[$name] = array(
+			'git' => $git,
+			'branch' => $branch
+		);
+		wfLoadSkin( $name );
+	}
 
-	// 	$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
-	// 	$fetchedSha1 = shell_exec( "git rev-parse --verify {$conf['checkout']}" );
-		
-	// 	if ($currentSha1 !== $fetchedSha1) {
-	// 		$this->maintScript->output( "\nCurrent commit: $currentSha1" );
-	// 		$this->maintScript->output( "\nChecking out new commit: $fetchedSha1\n" );
-	// 		$this->maintScript->output( shell_exec( "git checkout {$conf['checkout']}" ) );
-	// 	}
-	// 	else {
-	// 		$this->maintScript->output( "\nsha1 unchanged, no update required ($currentSha1)" );
-	// 	}
-		
-	// 	return true;
-	
-	// }
+	/**
+	 *
+	 *
+	 **/
+	public function multiLoadSkin ( $skins ) {
+		foreach ( $skins as $skin => $info ) {
+			$this->skins[$ext] = $info;
+		}
+		wfLoadSkins( array_keys( $skins ) );
+	}
 
 }
