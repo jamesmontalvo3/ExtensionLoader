@@ -82,7 +82,7 @@ class ExtensionLoader {
 	 *
 	 *  require_once $extensionLoader->registerLegacyExtension(
 	 *      "ParserFunctions",
-	 *      "https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git"
+	 *      "https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git",
 	 *      "REL1_25"
 	 *  );
 	 *
