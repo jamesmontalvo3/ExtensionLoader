@@ -44,6 +44,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
  	// initiates or updates extensions
 	public function execute() {
+
 		$this->extensionLoader = ExtensionLoader::$loader;
 
 		if ( $this->getArg(0) ) {

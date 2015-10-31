@@ -70,6 +70,8 @@ class ExtensionLoader {
 			$wgStyleDirectory = $styleDir;
 		}
 
+		self::$loader = $this;
+
 	}
 
 
