@@ -1,3 +1,3 @@
-# Extman -- working title for new extension manager
+# ExtensionLoader
 
-Making managing extensions more better.
+Binding MediaWiki extension source and version to `LocalSettings.php`.
