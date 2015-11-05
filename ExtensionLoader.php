@@ -55,6 +55,9 @@ class ExtensionLoader {
 
 	public function __construct ( $extDir=false, $styleDir=false ) {
 
+		// used by maintenance script. Maybe there's a better way to do this...
+		self::$loader = $this;
+
 		if ( ! $extDir ) {
 			global $IP;
 			$this->extDir = "$IP/extensions";
