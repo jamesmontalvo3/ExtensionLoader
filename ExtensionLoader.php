@@ -91,12 +91,21 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function registerLegacyExtension ( $name, $git, $branch, $specialEntryPointFileName=false ) {
+		global $egExtensionLoaderUpdateScript;
 		$this->extensions[$name] = array(
 			'git' => $git,
 			'branch' => $branch,
 			'specialEntryPointFileName' => $specialEntryPointFileName,
 		);
 		$entryFile = $specialEntryPointFileName ? $specialEntryPointFileName : $name . '.php';
+		if ( $egExtensionLoaderUpdateScript ) {
+			// Hack! When running the EL update script you may not want to load
+			// extensions since they may not exist yet (you may be running the
+			// script just to load them). So instead of returning the location
+			// of an extension's entry point, we just return the EL entry point
+			// which we know is already loaded, so require_once will skip it.
+			return $this->extDir . "/ExtensionLoader/ExtensionLoader.php";
+		}
 		return $this->extDir . "/$name/$entryFile";
 	}
 
