@@ -130,12 +130,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		chdir( "{$this->extensionLoader->extDir}/$extName" );
 
-		if ( isset( $conf['branch'] ) && $conf['branch'] !== 'master' ) {
-			$this->output( shell_exec( "git checkout " . $conf['branch'] ) );
-		}
-		else if ( isset( $conf['tag'] ) ) {
-			$this->output( shell_exec( "git checkout tags/" . $conf['tag'] ) );
-		}
+		$this->checkDifferenceFromHead( $extName );
 
 	}
 
@@ -143,7 +138,6 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		$this->output( "\n## Checking for updates in $extName" );
 
-		$conf = $this->extensionLoader->extensions[$extName];
 		$extensionDirectory = "{$this->extensionLoader->extDir}/$extName";
 
 		if ( ! is_dir("$extensionDirectory/.git") ) {
@@ -157,6 +151,18 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		// git clone into directory named the same as the extension
 		$this->output( shell_exec( "git fetch origin" ) );
+
+		$this->checkDifferenceFromHead( $extName );
+
+		$this->output( "\n" );
+
+		return true;
+
+	}
+
+	public function checkDifferenceFromHead ( $extName ) {
+
+		$conf = $this->extensionLoader->extensions[$extName];
 
 		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
 		list( $checkoutType, $checkout ) = $this->getCheckoutInfo( $conf['version'] );
@@ -189,10 +195,6 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		else {
 			$this->output( "\nsha1 unchanged, no update required ($currentSha1)" );
 		}
-
-		$this->output( "\n" );
-
-		return true;
 
 	}
 
