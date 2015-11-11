@@ -92,11 +92,11 @@ class ExtensionLoader {
 	 *  );
 	 *
 	 **/
-	public function registerLegacyExtension ( $name, $git, $branch, $specialEntryPointFileName=false ) {
+	public function registerLegacyExtension ( $name, $git, $version, $specialEntryPointFileName=false ) {
 		global $egExtensionLoaderUpdateScript;
 		$this->extensions[$name] = array(
 			'git' => $git,
-			'branch' => $branch,
+			'version' => $version,
 			'specialEntryPointFileName' => $specialEntryPointFileName,
 		);
 		$entryFile = $specialEntryPointFileName ? $specialEntryPointFileName : $name . '.php';
@@ -115,10 +115,10 @@ class ExtensionLoader {
 	 *
 	 *
 	 **/
-	public function load ( $name, $git, $branch ) {
+	public function load ( $name, $git, $version ) {
 		$this->extensions[$name] = array(
 			'git' => $git,
-			'branch' => $branch
+			'version' => $version
 		);
 		wfLoadExtension( $name );
 	}
@@ -139,10 +139,10 @@ class ExtensionLoader {
 	 *
 	 *
 	 **/
-	public function loadSkin ( $name, $git, $branch ) {
+	public function loadSkin ( $name, $git, $version ) {
 		$this->skins[$name] = array(
 			'git' => $git,
-			'branch' => $branch
+			'version' => $version
 		);
 		wfLoadSkin( $name );
 	}

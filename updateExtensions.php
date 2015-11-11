@@ -154,36 +154,36 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		// change working directory to main extensions directory
 		chdir( $extensionDirectory );
 
+
 		// git clone into directory named the same as the extension
 		$this->output( shell_exec( "git fetch origin" ) );
 
-		$checkoutType = 'branch';
-		if ( isset( $conf['tag'] ) ) {
-			$checkoutType = 'tag';
-			$checkout = 'tags/' . $conf['tag'];
-		}
-		else if ( isset( $conf['branch'] ) ) {
-			$checkout = 'origin/' . $conf['branch'];
+		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
+		list( $checkoutType, $checkout ) = getCheckoutInfo( $conf['version'] );
+
+		if ( $checkoutType == "tag" || $checkoutType == "sha1" ) {
+			$fetchedSha1 = shell_exec( "git rev-parse --verify $checkout" );
 		}
 		else {
-			$checkoutTest = 'origin/master';
-			$checkout = 'origin/master';
+			// for branches you have to specify that you mean the remote branch
+			// if you don't do so, you check the state of the local branch which
+			// is unchanged at this point since you haven't done a merge.
+			$fetchedSha1 = shell_exec( "git rev-parse --verify origin/$checkout" );
 		}
-
-		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
-		$fetchedSha1 = shell_exec( "git rev-parse --verify $checkout" );
 
 		if ($currentSha1 !== $fetchedSha1) {
 			$this->output( "\nCurrent commit: $currentSha1" );
 			$this->output( "\nChecking out new commit for $checkout: $fetchedSha1\n" );
 
-			if ( $checkoutType === 'tag' ) {
-				// checkout the tagged commit
+			if ( $checkoutType === 'branch' ){
+				// switch to this branch (if necessary)
 				$this->output( shell_exec( "git checkout $checkout" ) );
+
+				// merge in latest
+				$this->output( shell_exec( "git merge origin/$checkout" ) );
 			}
 			else {
-				// move local master pointer to the location of origin/master
-				$this->output( shell_exec( "git reset --hard $checkout" ) );
+				$this->output( shell_exec( "git checkout $checkout" ) );
 			}
 		}
 		else {
@@ -196,7 +196,64 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 	}
 
+	/**
+	 *  Inputs like:
+ 	 *	tags/v0.3.0
+	 *	branch:REL1_25
+	 *	a2e7bc52
+	 *
+	 *  @return array( $checkoutType, $checkoutName )
+	 *	 -> checkoutType like tag, branch, or sha1
+	 *	 -> checkoutName like tags/v0.1.0, REL1_25, or a2e7bc52
+	 **/
+	protected function getCheckoutInfo ( $version ) {
+		if ( $this->checkForSha1( $version ) ) {
+			$checkoutType = 'sha1';
+		}
+		elseif ( $this->strHasPrefix( $version, 'tags/' ) ) {
+			$checkoutType = 'tag';
+		}
+		else {
+			$checkoutType = 'branch';
+		}
+		return array( $checkoutType, $version );
+	}
 
+	private function strHasPrefix ( $string, $prefix ) {
+		if ( substr( $string, 0, strlen( $prefix ) ) === $prefix ) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	// @REMOVE
+	// private function splitTypeAndCheckout ( $version, $prefix ) {
+	// 	if ( substr( $version, 0, strlen( $prefix ) ) === $prefix ) {
+	// 		return array(
+	// 			substr( $prefix, 0, -1 ), // remove last character from prefix (the colon)
+	// 			substr( $version, strlen( $prefix ) )
+	// 		);
+	// 	}
+	// 	else {
+	// 		return false;
+	// 	}
+	// }
+
+	private function checkForSha1 ( $version ) {
+		if ( strlen( $version ) < 6 ) {
+			// not long enough...need at least the first 6 chars of commit hash
+			return false;
+		}
+		elseif ( preg_match( '/[^1234567890abcdef]/', $version ) {
+		    // string contains non-hex characters
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
 
 	protected function showErrors () {
 
