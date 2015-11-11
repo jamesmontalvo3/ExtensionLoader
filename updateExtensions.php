@@ -159,7 +159,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		$this->output( shell_exec( "git fetch origin" ) );
 
 		$currentSha1 = shell_exec( "git rev-parse --verify HEAD" );
-		list( $checkoutType, $checkout ) = getCheckoutInfo( $conf['version'] );
+		list( $checkoutType, $checkout ) = $this->getCheckoutInfo( $conf['version'] );
 
 		if ( $checkoutType == "tag" || $checkoutType == "sha1" ) {
 			$fetchedSha1 = shell_exec( "git rev-parse --verify $checkout" );
@@ -246,7 +246,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 			// not long enough...need at least the first 6 chars of commit hash
 			return false;
 		}
-		elseif ( preg_match( '/[^1234567890abcdef]/', $version ) {
+		elseif ( preg_match( '/[^1234567890abcdef]/', $version ) ) {
 		    // string contains non-hex characters
 			return false;
 		}
