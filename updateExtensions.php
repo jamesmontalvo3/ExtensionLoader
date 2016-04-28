@@ -96,7 +96,9 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 				$skipExtensions = array();
 				foreach ( $skipExtensionsRaw as $extName ) {
 					// cleanup name, turn array around for fast hash table lookup
-					$skipExtensions[ trim($extName) ] = true;
+					if ( trim($extName) !== "" ) {
+						$skipExtensions[ trim($extName) ] = true;
+					}
 				}
 			}
 		}
@@ -125,7 +127,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		// add any complete extensions to log file.
 		if ( $skipLogFile ) {
-			file_put_contents( $skipLogFile, implode( "\n", $completedExtensions), FILE_APPEND );
+			file_put_contents( $skipLogFile, implode( "\n", $completedExtensions) . "\n", FILE_APPEND );
 		}
 
 		$this->output( "\n## Finished updating wiki extensions. Remember to run update.php\n" );
