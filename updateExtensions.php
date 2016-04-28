@@ -105,6 +105,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		foreach( $toLoad as $extName ) {
 
 			if ( isset( $skipExtensions[$extName] ) ) {
+				$this->output( "\n## Skipping $extName since it's in skip log $skipLogFile \n" );
 				continue; // in skip log, skip it...
 			}
 
@@ -123,7 +124,9 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		}
 
 		// add any complete extensions to log file.
-		file_put_contents( $skipLogFile, implode( "\n", $completedExtensions), FILE_APPEND );
+		if ( $skipLogFile ) {
+			file_put_contents( $skipLogFile, implode( "\n", $completedExtensions), FILE_APPEND );
+		}
 
 		$this->output( "\n## Finished updating wiki extensions. Remember to run update.php\n" );
 		$this->showErrors();
