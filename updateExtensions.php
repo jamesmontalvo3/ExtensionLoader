@@ -105,7 +105,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 		foreach( $toLoad as $extName ) {
 
 			if ( isset( $skipExtensions[$extName] ) ) {
-				$this->output( "\n## Skipping $extName since it's in skip log $skipLogFile \n" );
+				$this->output( "\n## Skipping $extName since it's in skip-log $skipLogFile \n" );
 				continue; // in skip log, skip it...
 			}
 
