@@ -38,8 +38,22 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 	public function __construct() {
 		parent::__construct();
-
 		$this->mDescription = "Update or install extensions managed by ExtensionLoader.";
+
+		// addOption ($name, $description, $required=false, $withArg=false, $shortName=false)
+		$this->addOption(
+			'only',
+			'Only update extensions in comma-separated list (no spaces)',
+			false,
+			true
+		);
+		$this->addOption(
+			'skip-log',
+			'Ignore extensions already in this log, and add to the log any newly updated extensions',
+			false,
+			true
+		);
+
 	}
 
  	// initiates or updates extensions
@@ -47,19 +61,18 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		$this->extensionLoader = ExtensionLoader::$loader;
 
-		if ( $this->getArg(0) ) {
-			$i = 0;
+		if ( $this->getOption( 'only' ) ) {
 			$toLoad = array();
 			$didNotLoad = array();
-			while ( $this->getArg($i) ) {
-				$ext = $this->getArg($i);
+			$onlyExtensions = explode( ',', $this->getOption( 'only' ) );
+			foreach ( $onlyExtensions as $ext ) {
+				$ext = trim( $ext );
 				if ( array_key_exists( $ext, $this->extensionLoader->extensions ) ) {
 					$toLoad[] = $ext;
 				}
 				else {
 					$didNotLoad[] = $ext;
 				}
-				$i++;
 			}
 			$this->output( "\nUpdating the following extensions:\n\t" . implode( "\n\t", $toLoad ) . "\n" );
 
@@ -74,7 +87,29 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 			$this->output( "Updating all extensions" );
 		}
 
+		// if a log file specified, read from it to determine if any extensions
+		// need to be skipped
+		$skipLogFile = $this->getOption( 'skip-log' );
+		if ( $skipLogFile ) {
+			if ( file_exists( $skipLogFile ) ) {
+				$skipExtensionsRaw = explode( "\n", file_get_contents( $skipLogFile ) );
+				$skipExtensions = array();
+				foreach ( $skipExtensionsRaw as $extName ) {
+					// cleanup name, turn array around for fast hash table lookup
+					if ( trim($extName) !== "" ) {
+						$skipExtensions[ trim($extName) ] = true;
+					}
+				}
+			}
+		}
+
+		$completedExtensions = array();
 		foreach( $toLoad as $extName ) {
+
+			if ( isset( $skipExtensions[$extName] ) ) {
+				$this->output( "\n## Skipping $extName since it's in skip-log $skipLogFile \n" );
+				continue; // in skip log, skip it...
+			}
 
 			$extensionDir = $this->extensionLoader->extDir . "/$extName";
 
@@ -86,8 +121,14 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 				$this->cloneGitRepo( $extName );
 			}
 
+			$completedExtensions[] = $extName;
+
 		}
 
+		// add any complete extensions to log file.
+		if ( $skipLogFile ) {
+			file_put_contents( $skipLogFile, implode( "\n", $completedExtensions) . "\n", FILE_APPEND );
+		}
 
 		$this->output( "\n## Finished updating wiki extensions. Remember to run update.php\n" );
 		$this->showErrors();
