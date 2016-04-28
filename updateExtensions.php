@@ -42,7 +42,7 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		// addOption ($name, $description, $required=false, $withArg=false, $shortName=false)
 		$this->addOption(
-			'only-extensions',
+			'only',
 			'Only update extensions in comma-separated list (no spaces)',
 			false,
 			true
@@ -61,10 +61,10 @@ class ExtensionLoaderUpdateExtensions extends Maintenance {
 
 		$this->extensionLoader = ExtensionLoader::$loader;
 
-		if ( $this->getOption( 'only-extensions' ) ) {
+		if ( $this->getOption( 'only' ) ) {
 			$toLoad = array();
 			$didNotLoad = array();
-			$onlyExtensions = explode( ',', $this->getOption( 'only-extensions' ) );
+			$onlyExtensions = explode( ',', $this->getOption( 'only' ) );
 			foreach ( $onlyExtensions as $ext ) {
 				$ext = trim( $ext );
 				if ( array_key_exists( $ext, $this->extensionLoader->extensions ) ) {
