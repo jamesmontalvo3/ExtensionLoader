@@ -120,6 +120,10 @@ class ExtensionLoader {
 			'git' => $git,
 			'version' => $version
 		);
+		global $egExtensionLoaderUpdateScript;
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load extensions during updateExtensions.php
+		}
 		wfLoadExtension( $name );
 	}
 
@@ -130,6 +134,10 @@ class ExtensionLoader {
 	public function multiLoad ( $extensions ) {
 		foreach ( $extensions as $ext => $info ) {
 			$this->extensions[$ext] = $info;
+		}
+		global $egExtensionLoaderUpdateScript;
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load extensions during updateExtensions.php
 		}
 		wfLoadExtensions( array_keys( $extensions ) );
 	}
@@ -144,6 +152,10 @@ class ExtensionLoader {
 			'git' => $git,
 			'version' => $version
 		);
+		global $egExtensionLoaderUpdateScript;
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load skins during updateExtensions.php
+		}
 		wfLoadSkin( $name );
 	}
 
@@ -154,6 +166,10 @@ class ExtensionLoader {
 	public function multiLoadSkin ( $skins ) {
 		foreach ( $skins as $skin => $info ) {
 			$this->skins[$ext] = $info;
+		}
+		global $egExtensionLoaderUpdateScript;
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load skins during updateExtensions.php
 		}
 		wfLoadSkins( array_keys( $skins ) );
 	}
