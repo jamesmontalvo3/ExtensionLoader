@@ -116,6 +116,7 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function load ( $name, $git, $version ) {
+		global $egExtensionLoaderUpdateScript;
 		if ( $egExtensionLoaderUpdateScript ) {
 			return; // don't actually load extensions during updateExtensions.php
 		}
@@ -131,6 +132,7 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function multiLoad ( $extensions ) {
+		global $egExtensionLoaderUpdateScript;
 		if ( $egExtensionLoaderUpdateScript ) {
 			return; // don't actually load extensions during updateExtensions.php
 		}
@@ -146,6 +148,7 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function loadSkin ( $name, $git, $version ) {
+		global $egExtensionLoaderUpdateScript;
 		if ( $egExtensionLoaderUpdateScript ) {
 			return; // don't actually load skins during updateExtensions.php
 		}
@@ -161,6 +164,7 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function multiLoadSkin ( $skins ) {
+		global $egExtensionLoaderUpdateScript;
 		if ( $egExtensionLoaderUpdateScript ) {
 			return; // don't actually load skins during updateExtensions.php
 		}
