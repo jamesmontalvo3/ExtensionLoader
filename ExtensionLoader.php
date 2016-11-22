@@ -116,6 +116,9 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function load ( $name, $git, $version ) {
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load extensions during updateExtensions.php
+		}
 		$this->extensions[$name] = array(
 			'git' => $git,
 			'version' => $version
@@ -128,6 +131,9 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function multiLoad ( $extensions ) {
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load extensions during updateExtensions.php
+		}
 		foreach ( $extensions as $ext => $info ) {
 			$this->extensions[$ext] = $info;
 		}
@@ -140,6 +146,9 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function loadSkin ( $name, $git, $version ) {
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load skins during updateExtensions.php
+		}
 		$this->skins[$name] = array(
 			'git' => $git,
 			'version' => $version
@@ -152,6 +161,9 @@ class ExtensionLoader {
 	 *
 	 **/
 	public function multiLoadSkin ( $skins ) {
+		if ( $egExtensionLoaderUpdateScript ) {
+			return; // don't actually load skins during updateExtensions.php
+		}
 		foreach ( $skins as $skin => $info ) {
 			$this->skins[$ext] = $info;
 		}
